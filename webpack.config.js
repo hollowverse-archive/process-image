@@ -8,7 +8,7 @@ const { ifProd } = require('./env');
 
 module.exports = {
   entry: {
-    assignEnvironment: [path.join(__dirname, 'src', 'assignEnvironment.ts')],
+    cropFace: [path.join(__dirname, 'src', 'cropFace.ts')],
   },
   target: 'node',
   devtool: 'source-map',
