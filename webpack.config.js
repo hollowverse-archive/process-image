@@ -3,12 +3,21 @@
 const webpack = require('webpack');
 const path = require('path');
 const BabelMinifyPlugin = require('babel-minify-webpack-plugin');
-const { mapValues } = require('lodash');
-const { ifProd } = require('./env');
+const nodeExternals = require('webpack-node-externals');
+const { ifProd, isProd } = require('./env');
 
 module.exports = {
+  mode: isProd ? 'production' : 'development',
   entry: {
     cropFace: [path.join(__dirname, 'src', 'cropFace.ts')],
+  },
+  optimization: {
+    mergeDuplicateChunks: true,
+    occurrenceOrder: true,
+    noEmitOnErrors: true,
+    namedModules: true,
+    namedChunks: true,
+    nodeEnv: process.env.NODE_ENV || 'development',
   },
   target: 'node',
   devtool: 'source-map',
@@ -36,20 +45,9 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
+  externals: [nodeExternals()],
   plugins: [
     new webpack.WatchIgnorePlugin([/node_modules/]),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.ModuleConcatenationPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.AggressiveMergingPlugin(),
-    new webpack.DefinePlugin(
-      mapValues(
-        {
-          'process.env.NODE_ENV': process.env.NODE_ENV,
-        },
-        v => JSON.stringify(v),
-      ),
-    ),
     ...ifProd([new BabelMinifyPlugin()]),
   ],
 };
