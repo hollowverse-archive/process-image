@@ -2,6 +2,7 @@ import { Handler, S3Event } from 'aws-lambda'; // tslint:disable-line:no-implici
 import awsSdk from 'aws-sdk';
 import jimp from 'jimp';
 import fs from 'fs';
+import { getSmallestBoundingBoxForBoxes, scaleBox } from './helpers';
 
 const rekognition = new awsSdk.Rekognition({
   region: 'us-east-1',
@@ -13,7 +14,7 @@ const s3 = new awsSdk.S3({
 
 export const cropFace: Handler<S3Event> = async (_event, _context, done) => {
   try {
-    const fileName = 'Michael_Moore.jpg';
+    const fileName = 'Alyssa_Milano.jpg';
     const { FaceDetails } = await rekognition
       .detectFaces({
         Image: {
@@ -26,13 +27,6 @@ export const cropFace: Handler<S3Event> = async (_event, _context, done) => {
       .promise();
 
     if (Array.isArray(FaceDetails) && FaceDetails.length > 0) {
-      const details = FaceDetails.filter(
-        ({ Confidence, BoundingBox }) =>
-          typeof Confidence === 'number' &&
-          Confidence >= 0.85 &&
-          BoundingBox !== undefined,
-      ).map(({ BoundingBox }) => BoundingBox!);
-
       const { Body } = await s3
         .getObject({
           Bucket: 'hollowverse.public',
@@ -43,32 +37,41 @@ export const cropFace: Handler<S3Event> = async (_event, _context, done) => {
       fs.writeFileSync('input.jpg', Body);
 
       const image = await jimp.read(Body as Buffer);
-      const { width, height } = image.bitmap;
+      const { width: actualWidth, height: actualHeight } = image.bitmap;
 
-      const box = {
-        top: height * Math.min(...details.map(({ Top }) => Top!)),
-        height: height * Math.max(...details.map(({ Height }) => Height!)),
-        left: width * Math.min(...details.map(({ Left }) => Left!)),
-        width: width * Math.max(...details.map(({ Width }) => Width!)),
-      };
+      const faceBoxes = FaceDetails.filter(
+        ({ Confidence, BoundingBox }) =>
+          typeof Confidence === 'number' &&
+          Confidence >= 0.85 &&
+          BoundingBox !== undefined,
+      ).map(({ BoundingBox }) => {
+        // tslint:disable no-non-null-assertion
+        const { Top, Left, Width, Height } = BoundingBox!;
 
-      const boxScaling = 0.9;
-      const croppedLeft = Math.max(0, box.left - box.left * boxScaling);
-      const croppedTop = Math.max(0, box.top - box.top * boxScaling);
-      const croppedWidth = Math.min(box.width + box.width * boxScaling, width);
-      const croppedHeight = Math.min(
-        box.height + box.height * boxScaling,
-        height,
+        return {
+          top: actualHeight * Top!,
+          height: actualHeight * Height!,
+          left: actualWidth * Left!,
+          width: actualWidth * Width!,
+        };
+        // tslint:enable no-non-null-assertion
+      });
+
+      const smallestBoundingBox = getSmallestBoundingBoxForBoxes(faceBoxes);
+
+      const scale = Math.min(
+        actualWidth / smallestBoundingBox.width,
+        actualHeight / smallestBoundingBox.height,
       );
-      image.quality(85);
 
-      image.crop(
-        croppedLeft,
-        croppedTop,
-        Math.min(croppedWidth, croppedHeight),
-        Math.min(croppedWidth, croppedHeight),
-      );
-      image.write('./output.jpg');
+      const finalBox = scaleBox(smallestBoundingBox, scale);
+      const minDimension = Math.min(finalBox.height, finalBox.width);
+
+      image.crop(finalBox.left, finalBox.top, minDimension, minDimension);
+
+      image.write('./output.jpg', () => {
+        done(null);
+      });
     }
 
     done(null);
