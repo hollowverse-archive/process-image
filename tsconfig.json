@@ -1,6 +1,6 @@
 {
   "extends": "./node_modules/@hollowverse/common/tsconfig.json",
-  "exclude": ["./dist", ".webpack", "node_modules"],
+  "exclude": ["./dist", "node_modules"],
   "compilerOptions": {
     "checkJs": false
   }

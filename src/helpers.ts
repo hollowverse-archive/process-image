@@ -4,7 +4,6 @@ import {
   scale,
   applyToPoint,
 } from 'transformation-matrix';
-import { clamp } from 'lodash';
 
 export type BoundingBox = {
   top: number;

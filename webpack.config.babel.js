@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const path = require('path');
 const BabelMinifyPlugin = require('babel-minify-webpack-plugin');
 const { mapValues } = require('lodash');
+const nodeExternals = require('webpack-node-externals');
 const { ifProd } = require('./env');
 
 module.exports = {
@@ -36,6 +37,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
+  externals: nodeExternals(),
   plugins: [
     new webpack.WatchIgnorePlugin([/node_modules/]),
     new webpack.NoEmitOnErrorsPlugin(),
