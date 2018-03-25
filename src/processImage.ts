@@ -1,8 +1,8 @@
-import { Handler, S3Event } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
 import awsSdk from 'aws-sdk';
 import jimp from 'jimp';
 import bluebird from 'bluebird';
 import { getSmallestBoundingBoxForBoxes, scaleBox } from './helpers';
+import { Handler, S3Event } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
 
 const rekognition = new awsSdk.Rekognition({
   region: 'us-east-1',
@@ -13,7 +13,7 @@ const s3 = new awsSdk.S3({
 });
 
 // tslint:disable-next-line:max-func-body-length
-export const cropFace: Handler<S3Event> = async (event, _context, done) => {
+export const processImage: Handler<S3Event> = async (event, _context, done) => {
   try {
     const { eventName } = event.Records[0];
     const targetBucketName = 'hollowverse.public-test';

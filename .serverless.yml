@@ -1,0 +1,30 @@
+service: hollowverse
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.ts
+    packager: yarn
+    includeModules: true # Enable auto-packing of external modules
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${opt:stage, 'development'}
+  memorySize: 512
+  environment:
+    NODE_ENV: ${opt:stage, self:provider.stage, 'local'}
+
+functions:
+  processImage:
+    handler: src/processImage.processImage
+
+package:
+  include:
+    - src/**
+    - secrets/**
+  exclude:
+    - .webpack
+

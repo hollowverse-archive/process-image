@@ -5,38 +5,16 @@
 const shelljs = require('shelljs');
 const {
   executeCommands,
-} = require('@hollowverse/common/helpers/executeCommands');
-const { createZipFile } = require('@hollowverse/common/helpers/createZipFile');
-const fs = require('fs');
-const awsSdk = require('aws-sdk');
+} = require('@hollowverse/utils/helpers/executeCommands');
 
-const { IS_PULL_REQUEST, AWS_REGION = 'us-east-1' } = shelljs.env;
+const { IS_PULL_REQUEST } = shelljs.env;
 
 const isPullRequest = IS_PULL_REQUEST !== 'false';
 
 async function main() {
-  const buildCommands = ['yarn clean', 'yarn test'];
+  const buildCommands = ['yarn test'];
   const deploymentCommands = [
-    'yarn build',
-    () => createZipFile('build.zip', ['dist/**/*'], ['secrets/**/*.enc']),
-    async () => {
-      const lambda = new awsSdk.Lambda({
-        apiVersion: '2015-03-31',
-        region: AWS_REGION,
-      });
-
-      try {
-        await lambda
-          .updateFunctionCode({
-            FunctionName: 'cropFace',
-            Publish: true,
-            ZipFile: fs.readFileSync('build.zip'),
-          })
-          .promise();
-      } catch (error) {
-        console.error(error.message);
-      }
-    },
+    'NODE_ENV=production yarn serverless deploy --stage production --force',
   ];
 
   let isDeployment = false;

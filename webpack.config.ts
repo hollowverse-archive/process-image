@@ -1,21 +1,19 @@
-/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
-
-const webpack = require('webpack');
-const path = require('path');
-const BabelMinifyPlugin = require('babel-minify-webpack-plugin');
-const { mapValues } = require('lodash');
-const nodeExternals = require('webpack-node-externals');
-const { ifProd } = require('./env');
+// tslint:disable:no-implicit-dependencies
+import webpack from 'webpack';
+import slsw from 'serverless-webpack';
+import path from 'path';
+import nodeExternals from 'webpack-node-externals';
+import BabelMinifyPlugin from 'babel-minify-webpack-plugin';
+import { mapValues } from 'lodash';
+import { ifProd } from './env';
 
 module.exports = {
-  entry: {
-    cropFace: [path.join(__dirname, 'src', 'cropFace.ts')],
-  },
+  entry: slsw.lib.entries,
   target: 'node',
   devtool: 'source-map',
   output: {
     libraryTarget: 'commonjs',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '.webpack'),
     filename: '[name].js',
   },
   stats: 'minimal',
@@ -37,21 +35,18 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  externals: nodeExternals(),
   plugins: [
     new webpack.WatchIgnorePlugin([/node_modules/]),
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.ModuleConcatenationPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.DefinePlugin(
       mapValues(
         {
           'process.env.NODE_ENV': process.env.NODE_ENV,
         },
-        v => JSON.stringify(v),
+        (v: any) => JSON.stringify(v),
       ),
     ),
     ...ifProd([new BabelMinifyPlugin()]),
   ],
+  externals: [nodeExternals()],
 };
