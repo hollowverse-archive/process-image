@@ -20,6 +20,17 @@ provider:
 functions:
   processImage:
     handler: src/processImage.processImage
+    events:
+      - s3:
+        bucket: hollowverse-photos-${opt:stage, 'development'}
+        event: s3:ObjectCreated:*
+        rules:
+          - prefix: notable-people/
+      - s3:
+        bucket: hollowverse-photos-${opt:stage, 'development'}
+        event: s3:ObjectRemoved:*
+        rules:
+          - prefix: notable-people/
 
 package:
   include:
