@@ -20,12 +20,11 @@ provider:
     - Effect: Allow
       Action:
         - s3:GetObject
-        - s3:GetObjectVersionTorrent
         - s3:GetObjectVersionTagging
         - s3:GetObjectTagging
         - s3:GetObjectVersionForReplication
       Resource:
-        - "arn:aws:s3:::hollowverse-photos-${opt:stage, 'development'}/*"
+        - arn:aws:s3:::hollowverse-photos-${opt:stage, 'development'}/*
     - Effect: Allow
       Action:
         - s3:DeleteObjectTagging
@@ -36,7 +35,7 @@ provider:
         - s3:DeleteObjectVersionTagging
         - s3:DeleteObject
       Resource:
-        - "arn:aws:s3:::hollowverse.public-test/*"
+        - arn:aws:s3:::hollowverse.public-test/*
     - Effect: Allow
       Action:
         - rekognition:DetectLabels
