@@ -1,4 +1,4 @@
-service: hollowverse
+service: process-image
 
 plugins:
   - serverless-webpack
@@ -15,22 +15,45 @@ provider:
   stage: ${opt:stage, 'development'}
   memorySize: 512
   environment:
-    NODE_ENV: ${opt:stage, self:provider.stage, 'local'}
+    NODE_ENV: ${opt:stage, 'local'}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:DeleteObjectTagging
+        - s3:PutObject
+        - s3:DeleteObjectVersion
+        - s3:PutObjectVersionTagging
+        - s3:PutObjectTagging
+        - s3:DeleteObjectVersionTagging
+        - s3:DeleteObject
+      Resource:
+        - "arn:aws:s3:::hollowverse.public-test/*"
+    - Effect: Allow
+      Action:
+        - rekognition:DetectLabels
+        - rekognition:GetCelebrityRecognition
+        - rekognition:DetectFaces
+        - rekognition:GetFaceDetection
+        - rekognition:RecognizeCelebrities
+        - rekognition:CompareFaces
+        - rekognition:GetCelebrityInfo
+        - rekognition:GetLabelDetection
+      Resource: "*"
 
 functions:
   processImage:
     handler: src/processImage.processImage
     events:
       - s3:
-        bucket: hollowverse-photos-${opt:stage, 'development'}
-        event: s3:ObjectCreated:*
-        rules:
-          - prefix: notable-people/
+          bucket: hollowverse-photos-${opt:stage, 'development'}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: notable-people/
       - s3:
-        bucket: hollowverse-photos-${opt:stage, 'development'}
-        event: s3:ObjectRemoved:*
-        rules:
-          - prefix: notable-people/
+          bucket: hollowverse-photos-${opt:stage, 'development'}
+          event: s3:ObjectRemoved:*
+          rules:
+            - prefix: notable-people/
 
 package:
   include:
