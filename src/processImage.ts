@@ -1,7 +1,5 @@
 import awsSdk from 'aws-sdk';
-import jimp from 'jimp';
-import bluebird from 'bluebird';
-import { getSmallestBoundingBoxForBoxes, scaleBox } from './helpers';
+import { cropImage } from './helpers';
 import { Handler, S3Event } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
 
 const rekognition = new awsSdk.Rekognition({
@@ -52,9 +50,6 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
           })
           .promise();
 
-        const image = await jimp.read(Body as Buffer);
-        const { width: actualWidth, height: actualHeight } = image.bitmap;
-
         const faceBoxes = FaceDetails.filter(
           ({ Confidence, BoundingBox }) =>
             typeof Confidence === 'number' &&
@@ -65,34 +60,15 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
           const { Top, Left, Width, Height } = BoundingBox!;
 
           return {
-            top: actualHeight * Top!,
-            height: actualHeight * Height!,
-            left: actualWidth * Left!,
-            width: actualWidth * Width!,
+            top: Top!,
+            height: Height!,
+            left: Left!,
+            width: Width!,
           };
           // tslint:enable no-non-null-assertion
         });
 
-        const smallestBoundingBox = getSmallestBoundingBoxForBoxes(faceBoxes);
-
-        const scale = Math.min(
-          actualWidth / smallestBoundingBox.width,
-          actualHeight / smallestBoundingBox.height,
-        );
-
-        const finalBox = scaleBox(smallestBoundingBox, scale);
-        const minDimension = Math.min(finalBox.height, finalBox.width);
-
-        image.crop(
-          Math.max(0, finalBox.left),
-          Math.max(0, finalBox.top),
-          minDimension,
-          minDimension,
-        );
-
-        const buffer = await bluebird.fromCallback<Buffer>(cb =>
-          image.getBuffer(image.getMIME(), cb),
-        );
+        const buffer = await cropImage({ faceBoxes, body: Body as Buffer });
 
         await s3
           .putObject({

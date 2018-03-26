@@ -52,3 +52,43 @@ export const getSmallestBoundingBoxForBoxes = (
     width: Math.max(...boxes.map(({ width }) => width)),
   };
 };
+
+import jimp from 'jimp';
+import bluebird from 'bluebird';
+
+type CropImageOptions = {
+  body: Buffer;
+  faceBoxes: BoundingBox[];
+};
+
+export const cropImage = async ({ body, faceBoxes }: CropImageOptions) => {
+  const image = await jimp.read(body);
+  const { width: actualWidth, height: actualHeight } = image.bitmap;
+  const smallestBoundingBox = getSmallestBoundingBoxForBoxes(
+    faceBoxes.map((faceBox): BoundingBox => ({
+      top: faceBox.top * actualHeight,
+      height: faceBox.height * actualHeight,
+      left: faceBox.left * actualWidth,
+      width: faceBox.width * actualWidth,
+    })),
+  );
+
+  const boxScaling = Math.min(
+    actualWidth / smallestBoundingBox.width,
+    actualHeight / smallestBoundingBox.height,
+  );
+
+  const finalBox = scaleBox(smallestBoundingBox, boxScaling);
+  const minDimension = Math.min(finalBox.height, finalBox.width);
+
+  image.crop(
+    Math.max(0, finalBox.left),
+    Math.max(0, finalBox.top),
+    minDimension,
+    minDimension,
+  );
+
+  return bluebird.fromCallback<Buffer>(cb =>
+    image.getBuffer(image.getMIME(), cb),
+  );
+};
