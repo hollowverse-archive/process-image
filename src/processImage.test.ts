@@ -12,15 +12,20 @@ describe('cropImage', () => {
   let directories: string[];
 
   beforeAll(async () => {
-    directories = (await glob('*/', {
+    directories = (await glob('Jonas*/', {
       cwd: path.join(__dirname, 'fixtures'),
       onlyDirectories: true,
       absolute: true,
     })) as string[];
   });
 
-  it('given an image and a an array of face boxes, it crops the image correctly', async () => {
-    await bluebird.map(
+  it('given an image and an array of face boxes, it crops the image correctly', async () => {
+    // tslint:disable-next-line:no-string-based-set-timeout
+    jest.setTimeout(directories.length * 5000);
+    expect.assertions(directories.length + 1);
+    expect(directories.length).toBeGreaterThan(0);
+
+    return bluebird.map(
       directories,
       async directory => {
         const files = (await glob('*', {

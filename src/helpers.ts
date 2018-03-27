@@ -48,11 +48,23 @@ export const scaleBox = (
 export const getSmallestBoundingBoxForBoxes = (
   boxes: BoundingBox[],
 ): BoundingBox => {
+  const _boxes = boxes.map(({ top, left, width, height }) => ({
+    top,
+    left,
+    right: width + left,
+    bottom: top + height,
+  }));
+
+  const minTop = Math.min(..._boxes.map(({ top }) => top));
+  const minLeft = Math.min(..._boxes.map(({ left }) => left));
+  const maxBottom = Math.max(..._boxes.map(({ bottom }) => bottom));
+  const maxRight = Math.max(..._boxes.map(({ right }) => right));
+
   return {
-    top: Math.min(...boxes.map(({ top }) => top)),
-    height: Math.max(...boxes.map(({ height }) => height)),
-    left: Math.min(...boxes.map(({ left }) => left)),
-    width: Math.max(...boxes.map(({ width }) => width)),
+    top: minTop,
+    height: maxBottom - minTop,
+    left: minLeft,
+    width: maxRight - minLeft,
   };
 };
 
@@ -77,31 +89,44 @@ export const cropImage = async ({
   ) {
     const smallestBoundingBox = getSmallestBoundingBoxForBoxes(
       // tslint:disable:no-non-null-assertion
-      rekognitionResponse
-        .FaceDetails!.map(details => details.BoundingBox!)
-        .map((faceBox): BoundingBox => ({
+      rekognitionResponse.FaceDetails.map(details => details.BoundingBox!).map(
+        (faceBox): BoundingBox => ({
           top: faceBox.Top! * actualHeight,
           height: faceBox.Height! * actualHeight,
           left: faceBox.Left! * actualWidth,
           width: faceBox.Width! * actualWidth,
-        })),
+        }),
+      ),
     );
 
-    const boxScaling = Math.min(
-      actualWidth / smallestBoundingBox.width,
-      actualHeight / smallestBoundingBox.height,
+    const boxScaling = Math.floor(
+      Math.min(
+        actualWidth / smallestBoundingBox.width,
+        actualHeight / smallestBoundingBox.height,
+      ),
     );
 
     const finalBox = scaleBox(smallestBoundingBox, boxScaling);
 
-    const minDimension = Math.min(finalBox.height, finalBox.width);
+    console.log({
+      smallestBoundingBox,
+      finalBox,
+      boxScaling
+    });
 
-    image.crop(
-      Math.max(0, finalBox.left),
-      Math.max(0, finalBox.top),
-      minDimension,
-      minDimension,
-    );
+    const minAcceptableDim = Math.max(finalBox.height, finalBox.width);
+
+    console.log(minAcceptableDim);
+
+    // const minActualDimension = Math.min(actualHeight, actualWidth);
+
+    await bluebird.fromCallback(cb => {
+      image.crop(finalBox.left, finalBox.top, minAcceptableDim, minAcceptableDim, cb);
+    });
+
+    // await bluebird.fromCallback(cb => {
+    //   image.con
+    // });
   }
 
   return bluebird.fromCallback<Buffer>(cb => image.getBuffer('image/png', cb));
