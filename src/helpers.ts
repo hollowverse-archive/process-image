@@ -4,6 +4,9 @@ import {
   scale,
   applyToPoint,
 } from 'transformation-matrix';
+import fs from 'fs';
+
+export const readFile = bluebird.promisify(fs.readFile);
 
 export type BoundingBox = {
   top: number;
@@ -55,40 +58,51 @@ export const getSmallestBoundingBoxForBoxes = (
 
 import jimp from 'jimp';
 import bluebird from 'bluebird';
+import { DetectFacesResponse } from 'aws-sdk/clients/rekognition';
 
 type CropImageOptions = {
   body: Buffer;
-  faceBoxes: BoundingBox[];
+  rekognitionResponse: DetectFacesResponse;
 };
 
-export const cropImage = async ({ body, faceBoxes }: CropImageOptions) => {
+export const cropImage = async ({
+  body,
+  rekognitionResponse,
+}: CropImageOptions) => {
   const image = await jimp.read(body);
   const { width: actualWidth, height: actualHeight } = image.bitmap;
-  const smallestBoundingBox = getSmallestBoundingBoxForBoxes(
-    faceBoxes.map((faceBox): BoundingBox => ({
-      top: faceBox.top * actualHeight,
-      height: faceBox.height * actualHeight,
-      left: faceBox.left * actualWidth,
-      width: faceBox.width * actualWidth,
-    })),
-  );
+  if (
+    rekognitionResponse.FaceDetails &&
+    rekognitionResponse.FaceDetails.length > 0
+  ) {
+    const smallestBoundingBox = getSmallestBoundingBoxForBoxes(
+      // tslint:disable:no-non-null-assertion
+      rekognitionResponse
+        .FaceDetails!.map(details => details.BoundingBox!)
+        .map((faceBox): BoundingBox => ({
+          top: faceBox.Top! * actualHeight,
+          height: faceBox.Height! * actualHeight,
+          left: faceBox.Left! * actualWidth,
+          width: faceBox.Width! * actualWidth,
+        })),
+    );
 
-  const boxScaling = Math.min(
-    actualWidth / smallestBoundingBox.width,
-    actualHeight / smallestBoundingBox.height,
-  );
+    const boxScaling = Math.min(
+      actualWidth / smallestBoundingBox.width,
+      actualHeight / smallestBoundingBox.height,
+    );
 
-  const finalBox = scaleBox(smallestBoundingBox, boxScaling);
-  const minDimension = Math.min(finalBox.height, finalBox.width);
+    const finalBox = scaleBox(smallestBoundingBox, boxScaling);
 
-  image.crop(
-    Math.max(0, finalBox.left),
-    Math.max(0, finalBox.top),
-    minDimension,
-    minDimension,
-  );
+    const minDimension = Math.min(finalBox.height, finalBox.width);
 
-  return bluebird.fromCallback<Buffer>(cb =>
-    image.getBuffer(image.getMIME(), cb),
-  );
+    image.crop(
+      Math.max(0, finalBox.left),
+      Math.max(0, finalBox.top),
+      minDimension,
+      minDimension,
+    );
+  }
+
+  return bluebird.fromCallback<Buffer>(cb => image.getBuffer('image/png', cb));
 };

@@ -31,7 +31,7 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
         })
         .promise();
     } else if (eventName.startsWith('ObjectCreated:')) {
-      const { FaceDetails } = await rekognition
+      const rekognitionResponse = await rekognition
         .detectFaces({
           Image: {
             S3Object: {
@@ -42,7 +42,10 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
         })
         .promise();
 
-      if (FaceDetails !== undefined && FaceDetails.length > 0) {
+      if (
+        rekognitionResponse.FaceDetails !== undefined &&
+        rekognitionResponse.FaceDetails.length > 0
+      ) {
         const { Body } = await s3
           .getObject({
             Bucket: sourceBucketName,
@@ -50,25 +53,10 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
           })
           .promise();
 
-        const faceBoxes = FaceDetails.filter(
-          ({ Confidence, BoundingBox }) =>
-            typeof Confidence === 'number' &&
-            Confidence >= 0.85 &&
-            BoundingBox !== undefined,
-        ).map(({ BoundingBox }) => {
-          // tslint:disable no-non-null-assertion
-          const { Top, Left, Width, Height } = BoundingBox!;
-
-          return {
-            top: Top!,
-            height: Height!,
-            left: Left!,
-            width: Width!,
-          };
-          // tslint:enable no-non-null-assertion
+        const buffer = await cropImage({
+          rekognitionResponse,
+          body: Body as Buffer,
         });
-
-        const buffer = await cropImage({ faceBoxes, body: Body as Buffer });
 
         await s3
           .putObject({
