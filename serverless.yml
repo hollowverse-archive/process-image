@@ -38,18 +38,7 @@ provider:
         - s3:DeleteObjectVersionTagging
         - s3:DeleteObject
       Resource:
-        - arn:aws:s3:::hollowverse.public-test/*
-    - Effect: Allow
-      Action:
-        - rekognition:DetectLabels
-        - rekognition:GetCelebrityRecognition
-        - rekognition:DetectFaces
-        - rekognition:GetFaceDetection
-        - rekognition:RecognizeCelebrities
-        - rekognition:CompareFaces
-        - rekognition:GetCelebrityInfo
-        - rekognition:GetLabelDetection
-      Resource: "*"
+        - arn:aws:s3:::hollowverse.public-${opt:stage, 'development'}/*
 
 functions:
   processImage:
