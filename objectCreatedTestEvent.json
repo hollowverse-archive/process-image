@@ -15,8 +15,8 @@
           "size": 43005
         },
         "bucket": {
-          "arn": "arn:aws:s3:::hollowverse-photos-development",
-          "name": "hollowverse-photos-development",
+          "arn": "arn:aws:s3:::hollowverse.photos-development",
+          "name": "hollowverse.photos-development",
           "ownerIdentity": {
             "principalId": "EXAMPLE"
           }

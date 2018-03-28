@@ -4,6 +4,7 @@ import cloudinary from 'cloudinary';
 import path from 'path';
 import fetch from 'node-fetch';
 import fs from 'fs';
+import bluebird from 'bluebird';
 
 const {
   TARGET_BUCKET_NAME,
@@ -41,6 +42,8 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
         })
         .promise();
     } else if (eventName.startsWith('ObjectCreated:')) {
+      const promises: Array<PromiseLike<any>> = [];
+
       const { Body } = await s3
         .getObject({
           Bucket: sourceBucketName,
@@ -54,7 +57,7 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
         .split('.')
         .pop()};base64,${(Body as Buffer).toString('base64')}`;
 
-      const { eager: [{ url }] } = await new Promise<any>(resolve =>
+      const { public_id, eager: [{ url }] } = await new Promise<any>(resolve =>
         cloudinary.uploader.upload(image, resolve, {
           eager: [
             {
@@ -62,28 +65,37 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
               height: 500,
               crop: 'thumb',
               gravity: 'faces',
-              // format: 'jpg',
             },
           ],
         }),
       );
 
       const buffer = await (await fetch(url)).buffer();
+      const deleteFileResultPromise = bluebird
+        .fromCallback(cb => cloudinary.v2.api.delete_resources([public_id], cb))
+        .catch(error =>
+          console.error('Failed to delete Cloudinary resource.', error),
+        );
+
+      promises.push(deleteFileResultPromise);
+
       const targetObjectKey = sourceObjectKey;
 
       if (process.env.NODE_ENV === 'local') {
         fs.writeFileSync(path.basename(targetObjectKey), buffer);
+      } else {
+        const saveFileToTargetBucketPromise = s3
+          .putObject({
+            Key: targetObjectKey,
+            Bucket: TARGET_BUCKET_NAME,
+            Body: buffer,
+          })
+          .promise();
 
-        return;
+        promises.push(saveFileToTargetBucketPromise);
       }
 
-      await s3
-        .putObject({
-          Key: targetObjectKey,
-          Bucket: TARGET_BUCKET_NAME,
-          Body: buffer,
-        })
-        .promise();
+      await Promise.all(promises);
     } else {
       throw new TypeError(`Unexpected event name: ${eventName}`);
     }
