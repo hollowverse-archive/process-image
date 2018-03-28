@@ -19,8 +19,8 @@ provider:
     CLOUDINARY_CLOUD_NAME: 'hollowverse'
     CLOUDINARY_API_KEY: '868831145451586'
     CLOUDINARY_API_SECRET: ${file(./secrets/cloudinary.json):apiSecret}
-    SOURCE_BUCKET_NAME: hollowverse.photos-${opt:stage, 'development'}
-    TARGET_BUCKET_NAME: hollowverse.public-${opt:stage, 'development'}
+    SOURCE_BUCKET_NAME: hollowverse.photos-unprocessed-${opt:stage, 'development'}
+    TARGET_BUCKET_NAME: hollowverse.photos-processed-${opt:stage, 'development'}
   iamRoleStatements:
     - Effect: Allow
       Action:
