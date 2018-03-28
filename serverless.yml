@@ -16,8 +16,8 @@ provider:
   memorySize: 512
   environment:
     NODE_ENV: ${opt:stage, 'local'}
-    CLOUDINARY_CLOUD_NAME: 'dmf82n9eh'
-    CLOUDINARY_API_KEY: ${file(./secrets/cloudinary.json):apiKey}
+    CLOUDINARY_CLOUD_NAME: 'hollowverse'
+    CLOUDINARY_API_KEY: '868831145451586'
     CLOUDINARY_API_SECRET: ${file(./secrets/cloudinary.json):apiSecret}
     SOURCE_BUCKET_NAME: hollowverse.photos-${opt:stage, 'development'}
     TARGET_BUCKET_NAME: hollowverse.public-${opt:stage, 'development'}
