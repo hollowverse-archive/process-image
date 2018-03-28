@@ -12,7 +12,7 @@ describe('cropImage', () => {
   let directories: string[];
 
   beforeAll(async () => {
-    directories = (await glob('Jonas*/', {
+    directories = (await glob(['Jonas*/'], {
       cwd: path.join(__dirname, 'fixtures'),
       onlyDirectories: true,
       absolute: true,

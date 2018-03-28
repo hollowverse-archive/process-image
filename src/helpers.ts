@@ -45,7 +45,7 @@ export const scaleBox = (
 };
 
 /** Find the smallest box that contains all the given boxes */
-export const getSmallestBoundingBoxForBoxes = (
+export const getMinimumBoundingBoxForBoxes = (
   boxes: BoundingBox[],
 ): BoundingBox => {
   const _boxes = boxes.map(({ top, left, width, height }) => ({
@@ -71,6 +71,7 @@ export const getSmallestBoundingBoxForBoxes = (
 import jimp from 'jimp';
 import bluebird from 'bluebird';
 import { DetectFacesResponse } from 'aws-sdk/clients/rekognition';
+import { floor } from 'lodash';
 
 type CropImageOptions = {
   body: Buffer;
@@ -87,7 +88,7 @@ export const cropImage = async ({
     rekognitionResponse.FaceDetails &&
     rekognitionResponse.FaceDetails.length > 0
   ) {
-    const smallestBoundingBox = getSmallestBoundingBoxForBoxes(
+    const minBoundingBox = getMinimumBoundingBoxForBoxes(
       // tslint:disable:no-non-null-assertion
       rekognitionResponse.FaceDetails.map(details => details.BoundingBox!).map(
         (faceBox): BoundingBox => ({
@@ -99,30 +100,35 @@ export const cropImage = async ({
       ),
     );
 
-    const boxScaling = Math.floor(
-      Math.min(
-        actualWidth / smallestBoundingBox.width,
-        actualHeight / smallestBoundingBox.height,
-      ),
+    const centerX = minBoundingBox.width / 2;
+    const centerY = minBoundingBox.height / 2;
+    const centerXToOriginal = centerX + minBoundingBox.left;
+    const centerYToOriginal = centerY + minBoundingBox.top;
+
+    console.log({ centerX, centerY, centerXToOriginal, centerYToOriginal });
+
+    const maxPossibleBoxScaling = floor(
+      Math.min(centerXToOriginal / centerX, centerYToOriginal / centerY),
+      1,
     );
 
-    const finalBox = scaleBox(smallestBoundingBox, boxScaling);
+    const finalBox = scaleBox(minBoundingBox, maxPossibleBoxScaling);
 
     console.log({
-      smallestBoundingBox,
+      minBoundingBox,
       finalBox,
-      boxScaling
+      maxPossibleBoxScaling,
     });
-
-    const minAcceptableDim = Math.max(finalBox.height, finalBox.width);
-
-    console.log(minAcceptableDim);
 
     // const minActualDimension = Math.min(actualHeight, actualWidth);
 
-    await bluebird.fromCallback(cb => {
-      image.crop(finalBox.left, finalBox.top, minAcceptableDim, minAcceptableDim, cb);
-    });
+    image.crop(finalBox.left, finalBox.top, finalBox.width, finalBox.height);
+
+    image.background(0x000000);
+
+    const minAcceptableDim = Math.min(actualHeight, actualWidth);
+    console.log({ minAcceptableDim });
+    image.contain(minAcceptableDim, minAcceptableDim);
 
     // await bluebird.fromCallback(cb => {
     //   image.con
