@@ -94,6 +94,7 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
             Key: targetObjectKey,
             Bucket: TARGET_BUCKET_NAME,
             Body: buffer,
+            CacheControl: 'public, max-age=31536000',
           })
           .promise();
 
