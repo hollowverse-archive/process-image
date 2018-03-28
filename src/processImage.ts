@@ -74,9 +74,9 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
       const buffer = await (await fetch(url)).buffer();
       const deleteFileResultPromise = bluebird
         .fromCallback(cb => cloudinary.v2.api.delete_resources([public_id], cb))
-        .catch(error =>
-          console.error('Failed to delete Cloudinary resource.', error),
-        );
+        .catch(error => {
+          console.error('Failed to delete Cloudinary resource.', error);
+        });
 
       promises.push(deleteFileResultPromise);
 
@@ -84,9 +84,9 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
 
       if (process.env.NODE_ENV === 'local') {
         promises.push(
-          bluebird.fromCallback(cb =>
-            fs.writeFile(path.basename(targetObjectKey), buffer, cb),
-          ),
+          bluebird.fromCallback(cb => {
+            fs.writeFile(path.basename(targetObjectKey), buffer, cb);
+          }),
         );
       } else {
         const saveFileToTargetBucketPromise = s3
