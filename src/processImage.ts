@@ -82,7 +82,11 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
       const targetObjectKey = sourceObjectKey;
 
       if (process.env.NODE_ENV === 'local') {
-        fs.writeFileSync(path.basename(targetObjectKey), buffer);
+        promises.push(
+          bluebird.fromCallback(cb =>
+            fs.writeFile(path.basename(targetObjectKey), buffer, cb),
+          ),
+        );
       } else {
         const saveFileToTargetBucketPromise = s3
           .putObject({
