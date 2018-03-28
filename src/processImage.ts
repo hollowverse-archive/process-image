@@ -44,30 +44,31 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
     } else if (eventName.startsWith('ObjectCreated:')) {
       const promises: Array<PromiseLike<any>> = [];
 
-      const { Body } = await s3
-        .getObject({
-          Bucket: sourceBucketName,
-          Key: sourceObjectKey,
-        })
-        .promise();
+      const { public_id, eager: [{ url }] } = await bluebird.fromCallback(
+        cb => {
+          const downloadStream = s3
+            .getObject({
+              Bucket: sourceBucketName,
+              Key: sourceObjectKey,
+            })
+            .createReadStream();
 
-      const extensionName = path.extname(sourceObjectKey);
-
-      const image = `data:image/${extensionName
-        .split('.')
-        .pop()};base64,${(Body as Buffer).toString('base64')}`;
-
-      const { public_id, eager: [{ url }] } = await new Promise<any>(resolve =>
-        cloudinary.uploader.upload(image, resolve, {
-          eager: [
+          const uploadStream = cloudinary.v2.uploader.upload_stream(
             {
-              width: 500,
-              height: 500,
-              crop: 'thumb',
-              gravity: 'faces',
+              eager: [
+                {
+                  width: 500,
+                  height: 500,
+                  crop: 'thumb',
+                  gravity: 'faces',
+                },
+              ],
             },
-          ],
-        }),
+            cb,
+          );
+
+          downloadStream.pipe(uploadStream);
+        },
       );
 
       const buffer = await (await fetch(url)).buffer();
