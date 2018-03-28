@@ -19,6 +19,8 @@ provider:
     CLOUDINARY_CLOUD_NAME: 'dmf82n9eh'
     CLOUDINARY_API_KEY: ${file(./secrets/cloudinary.json):apiKey}
     CLOUDINARY_API_SECRET: ${file(./secrets/cloudinary.json):apiSecret}
+    SOURCE_BUCKET_NAME: hollowverse.photos-${opt:stage, 'development'}
+    TARGET_BUCKET_NAME: hollowverse.public-${opt:stage, 'development'}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -27,7 +29,7 @@ provider:
         - s3:GetObjectTagging
         - s3:GetObjectVersionForReplication
       Resource:
-        - arn:aws:s3:::hollowverse-photos-${opt:stage, 'development'}/*
+        - arn:aws:s3:::${self:provider.environment.SOURCE_BUCKET_NAME}/*
     - Effect: Allow
       Action:
         - s3:DeleteObjectTagging
@@ -38,19 +40,19 @@ provider:
         - s3:DeleteObjectVersionTagging
         - s3:DeleteObject
       Resource:
-        - arn:aws:s3:::hollowverse.public-${opt:stage, 'development'}/*
+        - arn:aws:s3:::${self:provider.environment.TARGET_BUCKET_NAME}/*
 
 functions:
   processImage:
     handler: src/processImage.processImage
     events:
       - s3:
-          bucket: hollowverse-photos-${opt:stage, 'development'}
+          bucket: ${self:provider.environment.SOURCE_BUCKET_NAME}
           event: s3:ObjectCreated:*
           rules:
             - prefix: notable-people/
       - s3:
-          bucket: hollowverse-photos-${opt:stage, 'development'}
+          bucket: ${self:provider.environment.SOURCE_BUCKET_NAME}
           event: s3:ObjectRemoved:*
           rules:
             - prefix: notable-people/

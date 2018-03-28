@@ -5,21 +5,26 @@ import path from 'path';
 import fetch from 'node-fetch';
 import fs from 'fs';
 
+const {
+  TARGET_BUCKET_NAME,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET,
+} = process.env;
+
 const s3 = new awsSdk.S3({
   region: 'us-east-1',
 });
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: CLOUDINARY_CLOUD_NAME,
+  api_key: CLOUDINARY_API_KEY,
+  api_secret: CLOUDINARY_API_SECRET,
 });
 
-// tslint:disable-next-line:max-func-body-length
 export const processImage: Handler<S3Event> = async (event, _context, done) => {
   try {
     const { eventName } = event.Records[0];
-    const targetBucketName = 'hollowverse.public-test';
 
     const {
       object: { key: sourceObjectKey },
@@ -31,7 +36,7 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
     if (eventName.startsWith('ObjectRemoved:')) {
       await s3
         .deleteObject({
-          Bucket: targetBucketName,
+          Bucket: TARGET_BUCKET_NAME,
           Key: sourceObjectKey,
         })
         .promise();
@@ -66,17 +71,19 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
       const buffer = await (await fetch(url)).buffer();
       const targetObjectKey = sourceObjectKey;
 
-      if (process.env.NODE === 'production') {
-        await s3
-          .putObject({
-            Key: targetObjectKey,
-            Bucket: targetBucketName,
-            Body: buffer,
-          })
-          .promise();
-      } else {
+      if (process.env.NODE_ENV === 'local') {
         fs.writeFileSync(path.basename(targetObjectKey), buffer);
+
+        return;
       }
+
+      await s3
+        .putObject({
+          Key: targetObjectKey,
+          Bucket: TARGET_BUCKET_NAME,
+          Body: buffer,
+        })
+        .promise();
     } else {
       throw new TypeError(`Unexpected event name: ${eventName}`);
     }
