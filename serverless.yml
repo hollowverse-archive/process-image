@@ -16,6 +16,9 @@ provider:
   memorySize: 512
   environment:
     NODE_ENV: ${opt:stage, 'local'}
+    CLOUDINARY_CLOUD_NAME: 'dmf82n9eh'
+    CLOUDINARY_API_KEY: ${file(./secrets/cloudinary.json):apiKey}
+    CLOUDINARY_API_SECRET: ${file(./secrets/cloudinary.json):apiSecret}
   iamRoleStatements:
     - Effect: Allow
       Action:
