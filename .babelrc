@@ -1,0 +1,3 @@
+{
+  "extends": "@hollowverse/config/lambda/.babelrc"
+}

@@ -1,0 +1,66 @@
+service: process-image
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.ts
+    packager: yarn
+    includeModules: true # Enable auto-packing of external modules
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${opt:stage, 'development'}
+  memorySize: 512
+  environment:
+    NODE_ENV: ${opt:stage, 'local'}
+    CLOUDINARY_CLOUD_NAME: 'hollowverse'
+    CLOUDINARY_API_KEY: '868831145451586'
+    CLOUDINARY_API_SECRET: ${file(./secrets/cloudinary.json):apiSecret}
+    SOURCE_BUCKET_NAME: hollowverse.photos-unprocessed-${opt:stage, 'development'}
+    TARGET_BUCKET_NAME: hollowverse.photos-processed-${opt:stage, 'development'}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:GetObjectVersionTagging
+        - s3:GetObjectTagging
+        - s3:GetObjectVersionForReplication
+      Resource:
+        - arn:aws:s3:::${self:provider.environment.SOURCE_BUCKET_NAME}/*
+    - Effect: Allow
+      Action:
+        - s3:DeleteObjectTagging
+        - s3:PutObject
+        - s3:DeleteObjectVersion
+        - s3:PutObjectVersionTagging
+        - s3:PutObjectTagging
+        - s3:DeleteObjectVersionTagging
+        - s3:DeleteObject
+      Resource:
+        - arn:aws:s3:::${self:provider.environment.TARGET_BUCKET_NAME}/*
+
+functions:
+  processImage:
+    handler: src/processImage.processImage
+    events:
+      - s3:
+          bucket: ${self:provider.environment.SOURCE_BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: notable-people/
+      - s3:
+          bucket: ${self:provider.environment.SOURCE_BUCKET_NAME}
+          event: s3:ObjectRemoved:*
+          rules:
+            - prefix: notable-people/
+
+package:
+  include:
+    - src/**
+    - secrets/**
+  exclude:
+    - .webpack
+
