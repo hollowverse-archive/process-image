@@ -57,8 +57,8 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
             {
               eager: [
                 {
-                  width: 500,
-                  height: 500,
+                  width: 350,
+                  height: 350,
                   crop: 'thumb',
                   gravity: 'faces',
                 },
