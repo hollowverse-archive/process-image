@@ -20,10 +20,18 @@ const secrets = [
 ];
 
 async function main() {
-  const buildCommands = ['yarn test'];
+  const buildCommands = [
+    'yarn test',
+    'NODE_ENV=production yarn serverless package --stage production',
+  ];
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
-    'NODE_ENV=production yarn serverless deploy --stage production --force',
+    `NODE_ENV=production yarn serverless deploy
+      --package ./.serverless/process-image.zip
+      --stage production
+      --force
+      --aws-s3-accelerate
+    `,
   ];
 
   let isDeployment = false;

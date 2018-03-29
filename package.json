@@ -1,7 +1,6 @@
 {
   "name": "perf-monitor",
-  "description":
-    "An AWS Lambda function that checks and reports the performance of hollowverse.com regularly",
+  "description": "An AWS Lambda function that checks and reports the performance of hollowverse.com regularly",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@github.com:hollowverse/perf-monitor.git",
@@ -34,7 +33,13 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"]
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ]
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.41",
@@ -73,12 +78,10 @@
     "@types/lodash": "^4.14.104",
     "@types/node": "6",
     "@types/shelljs": "^0.7.8",
-    "@types/webpack": "^4.0.0",
+    "@types/webpack": "3",
     "@types/weighted": "^0.0.5",
     "babel-eslint": "^8.2.1",
     "babel-loader": "^8.0.0-beta.2",
-    "babel-minify-webpack-plugin": "^0.3.1",
-    "babel-preset-minify": "^0.3.0",
     "del-cli": "^1.1.0",
     "eslint": "^4.18.0",
     "eslint-config-airbnb": "^16.1.0",
@@ -112,15 +115,27 @@
     "tslint-react": "^3.5.1",
     "typescript": "^2.8.1",
     "typescript-eslint-parser": "^14.0.0",
+    "uglifyjs-webpack-plugin": "^1.2.4",
     "webpack": "3",
     "webpack-node-externals": "^1.6.0",
     "yarnhook": "^0.1.1"
   },
   "lint-staged": {
-    "**/*.md": ["prettier --write", "git add"],
-    "**/*.{j,t}s{x,}": ["prettier --write", "git add"],
-    "**/!(package).json": ["prettier --write", "git add"],
-    "**/*.js{x,}": ["eslint"]
+    "**/*.md": [
+      "prettier --write",
+      "git add"
+    ],
+    "**/*.{j,t}s{x,}": [
+      "prettier --write",
+      "git add"
+    ],
+    "**/!(package).json": [
+      "prettier --write",
+      "git add"
+    ],
+    "**/*.js{x,}": [
+      "eslint"
+    ]
   },
   "husky": {
     "hooks": {
