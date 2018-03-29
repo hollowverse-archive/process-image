@@ -1,6 +1,7 @@
 {
   "name": "perf-monitor",
-  "description": "An AWS Lambda function that checks and reports the performance of hollowverse.com regularly",
+  "description":
+    "An AWS Lambda function that checks and reports the performance of hollowverse.com regularly",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@github.com:hollowverse/perf-monitor.git",
@@ -8,8 +9,7 @@
   "license": "Unlicense",
   "private": true,
   "scripts": {
-    "pretest": "run-p -l --aggregate-output validate-filenames lint",
-    "test": "jest",
+    "test": "run-p -l --aggregate-output validate-filenames lint",
     "check-ts/src": "tsc --project ./src --noEmit",
     "check-ts/root": "tsc --project ./ --noEmit",
     "check-ts": "run-p 'check-ts/*'",
@@ -34,13 +34,7 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json"
-    ]
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"]
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.41",
@@ -123,26 +117,15 @@
     "yarnhook": "^0.1.1"
   },
   "lint-staged": {
-    "**/*.md": [
-      "prettier --write",
-      "git add"
-    ],
-    "**/*.{j,t}s{x,}": [
-      "prettier --write",
-      "git add"
-    ],
-    "**/!(package).json": [
-      "prettier --write",
-      "git add"
-    ],
-    "**/*.js{x,}": [
-      "eslint"
-    ]
+    "**/*.md": ["prettier --write", "git add"],
+    "**/*.{j,t}s{x,}": ["prettier --write", "git add"],
+    "**/!(package).json": ["prettier --write", "git add"],
+    "**/*.js{x,}": ["eslint"]
   },
   "husky": {
     "hooks": {
       "pre-commit": "run-p --aggregate-output validate-filenames lint-staged",
-      "pre-push": "yarn pretest",
+      "pre-push": "yarn test",
       "post-merge": "yarnhook",
       "post-checkout": "yarnhook",
       "post-rewrite": "yarnhook"
