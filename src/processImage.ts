@@ -71,7 +71,10 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
         },
       );
 
-      const buffer = await (await fetch(url)).buffer();
+      const response = await fetch(url);
+      const contentType = response.headers.get('Content-Type');
+      const buffer = await response.buffer();
+
       const deleteFileResultPromise = bluebird
         .fromCallback(cb => cloudinary.v2.api.delete_resources([public_id], cb))
         .catch(error => {
@@ -95,6 +98,7 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
             Bucket: TARGET_BUCKET_NAME,
             Body: buffer,
             CacheControl: 'public, max-age=31536000',
+            ContentType: contentType,
           })
           .promise();
 
