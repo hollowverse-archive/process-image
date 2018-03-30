@@ -8,7 +8,7 @@ const {
 } = require('@hollowverse/utils/helpers/executeCommands');
 const { decryptSecrets } = require('@hollowverse/utils/helpers/decryptSecrets');
 
-const { ENC_PASS_CLOUDINARY, IS_PULL_REQUEST } = shelljs.env;
+const { ENC_PASS_CLOUDINARY, IS_PULL_REQUEST, BRANCH } = shelljs.env;
 
 const isPullRequest = IS_PULL_REQUEST !== 'false';
 
@@ -40,8 +40,10 @@ async function main() {
   let isDeployment = false;
   if (isPullRequest === true) {
     console.info('Skipping deployment commands in PRs');
-  } else {
+  } else if (BRANCH === 'master') {
     isDeployment = true;
+  } else {
+    console.info('Skipping deployment commands in non-master branch');
   }
 
   try {
