@@ -5,7 +5,7 @@ import path from 'path';
 import nodeExternals from 'webpack-node-externals';
 import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import { mapValues } from 'lodash';
-import { ifProd } from './env';
+import { ifProd } from '@hollowverse/utils/helpers/env';
 
 module.exports = {
   entry: slsw.lib.entries,
