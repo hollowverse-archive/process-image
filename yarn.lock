@@ -638,9 +638,9 @@
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@hollowverse/config/-/config-4.0.0.tgz#3a417539bb0ebecbba31a9a830e6768204a7de98"
 
-"@hollowverse/utils@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@hollowverse/utils/-/utils-4.1.0.tgz#0525d58126d5accafa7cde64ee33a38e22ecb0fe"
+"@hollowverse/utils@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@hollowverse/utils/-/utils-4.1.1.tgz#ac5a72775713c6d4a1881d26a754056c33478a4e"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.40"
     bluebird "^3.5.1"
