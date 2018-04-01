@@ -25,12 +25,12 @@ cloudinary.config({
 
 export const processImage: Handler<S3Event> = async (event, _context, done) => {
   try {
-    const { eventName } = event.Records[0];
-
-    const {
-      object: { key: sourceObjectKey },
-      bucket: { name: sourceBucketName },
-    } = event.Records[0].s3;
+    const eventName = event.Records[0].eventName;
+    const sourceObjectKey = decodeURIComponent(
+      // AWS Lambda replaces spaces in URIs with a plus sign (+)
+      event.Records[0].s3.object.key.replace(/\+/g, ' '),
+    );
+    const sourceBucketName = event.Records[0].s3.bucket.name;
 
     // Object removed in source bucket, mirror that change
     // in the target bucket
