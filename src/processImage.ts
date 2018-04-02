@@ -1,10 +1,11 @@
 import awsSdk from 'aws-sdk';
-import { Handler, S3Event } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
+import { Handler, S3Event, Context } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
 import cloudinary from 'cloudinary';
 import path from 'path';
 import fetch from 'node-fetch';
 import fs from 'fs';
 import bluebird from 'bluebird';
+import s3UploadStream from 's3-upload-stream';
 
 const {
   TARGET_BUCKET_NAME,
@@ -23,11 +24,22 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-export const processImage: Handler<S3Event> = async (event, _context, done) => {
+const createLambdaHandler = <E, R>(
+  handleEvent: (event: E, context: Context) => Promise<R>,
+): Handler<E, R> => async (event, context, done) => {
   try {
+    done(null, await handleEvent(event, context));
+  } catch (e) {
+    console.error(e);
+    done(e);
+  }
+};
+
+export const processImage: Handler<S3Event> = createLambdaHandler(
+  async (event, _context) => {
     const eventName = event.Records[0].eventName;
     const sourceObjectKey = decodeURIComponent(
-      // AWS Lambda replaces spaces in URIs with a plus sign (+)
+      // S3 replaces spaces in URIs with a plus sign (+)
       event.Records[0].s3.object.key.replace(/\+/g, ' '),
     );
     const sourceBucketName = event.Records[0].s3.bucket.name;
@@ -42,8 +54,6 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
         })
         .promise();
     } else if (eventName.startsWith('ObjectCreated:')) {
-      const promises: Array<PromiseLike<any>> = [];
-
       const { public_id, eager: [{ url }] } = await bluebird.fromCallback(
         cb => {
           const downloadStream = s3
@@ -71,48 +81,42 @@ export const processImage: Handler<S3Event> = async (event, _context, done) => {
         },
       );
 
-      const response = await fetch(url);
-      const contentType = response.headers.get('Content-Type');
-      const buffer = await response.buffer();
-
-      const deleteFileResultPromise = bluebird
-        .fromCallback(cb => cloudinary.v2.api.delete_resources([public_id], cb))
-        .catch(error => {
-          console.error('Failed to delete Cloudinary resource.', error);
-        });
-
-      promises.push(deleteFileResultPromise);
+      const cloudinaryResponse = await fetch(url);
+      const contentType = cloudinaryResponse.headers.get('Content-Type');
 
       const targetObjectKey = sourceObjectKey;
 
       if (process.env.NODE_ENV === 'local') {
-        promises.push(
-          bluebird.fromCallback(cb => {
-            fs.writeFile(path.basename(targetObjectKey), buffer, cb);
-          }),
-        );
+        await bluebird.fromCallback(cb => {
+          fs.writeFile(
+            path.basename(targetObjectKey),
+            cloudinaryResponse.body,
+            cb,
+          );
+        });
       } else {
-        const saveFileToTargetBucketPromise = s3
-          .putObject({
-            Key: targetObjectKey,
-            Bucket: TARGET_BUCKET_NAME,
-            Body: buffer,
-            CacheControl: 'public, max-age=31536000',
-            ContentType: contentType,
-          })
-          .promise();
+        await new Promise((resolve, reject) => {
+          const uploadStream = s3UploadStream(s3)
+            .upload({
+              Key: targetObjectKey,
+              Bucket: TARGET_BUCKET_NAME,
+              CacheControl: 'public, max-age=31536000',
+              ContentType: contentType,
+            })
+            .on('finish', resolve)
+            .on('error', reject);
 
-        promises.push(saveFileToTargetBucketPromise);
+          cloudinaryResponse.body.pipe(uploadStream);
+        });
       }
 
-      await Promise.all(promises);
+      await bluebird
+        .fromCallback(cb => cloudinary.v2.api.delete_resources([public_id], cb))
+        .catch(error => {
+          console.error('Failed to delete Cloudinary resource.', error);
+        });
     } else {
       throw new TypeError(`Unexpected event name: ${eventName}`);
     }
-
-    done(null);
-  } catch (error) {
-    console.error(error);
-    done(error);
-  }
-};
+  },
+);

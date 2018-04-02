@@ -13,7 +13,7 @@ provider:
   name: aws
   runtime: nodejs6.10
   stage: ${opt:stage, 'development'}
-  memorySize: 512
+  memorySize: 128
   environment:
     NODE_ENV: ${opt:stage, 'local'}
     CLOUDINARY_CLOUD_NAME: 'hollowverse'
