@@ -43,10 +43,11 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.41",
-    "aws-sdk": "^2.208.0",
+    "aws-sdk": "^2.37.0",
     "bluebird": "^3.5.1",
     "cloudinary": "^1.11.0",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.1.2",
+    "s3-upload-stream": "^1.0.7"
   },
   "resolutions": {
     "webpack-sources": "1.0.1",
@@ -70,6 +71,7 @@
     "@types/lodash": "^4.14.104",
     "@types/node": "6",
     "@types/node-fetch": "^1.6.7",
+    "@types/s3-upload-stream": "^1.0.2",
     "@types/webpack": "3",
     "babel-eslint": "^8.2.1",
     "babel-loader": "^8.0.0-beta.2",
