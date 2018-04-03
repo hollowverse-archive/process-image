@@ -1,11 +1,12 @@
 import awsSdk from 'aws-sdk';
-import { Handler, S3Event, Context } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
+import { Handler, S3Event } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
 import cloudinary from 'cloudinary';
 import path from 'path';
 import fetch from 'node-fetch';
 import fs from 'fs';
 import bluebird from 'bluebird';
 import s3UploadStream from 's3-upload-stream';
+import { createLambdaHandler } from '@hollowverse/utils/helpers/createLambdaHandler';
 
 const {
   TARGET_BUCKET_NAME,
@@ -23,17 +24,6 @@ cloudinary.config({
   api_key: CLOUDINARY_API_KEY,
   api_secret: CLOUDINARY_API_SECRET,
 });
-
-const createLambdaHandler = <E, R>(
-  handleEvent: (event: E, context: Context) => Promise<R>,
-): Handler<E, R> => async (event, context, done) => {
-  try {
-    done(null, await handleEvent(event, context));
-  } catch (e) {
-    console.error(e);
-    done(e);
-  }
-};
 
 export const processImage: Handler<S3Event> = createLambdaHandler(
   async (event, _context) => {
