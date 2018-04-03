@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.44",
-    "@hollowverse/utils": "^5.0.0",
+    "@hollowverse/utils": "^5.0.1",
     "aws-sdk": "^2.37.0",
     "bluebird": "^3.5.1",
     "cloudinary": "^1.11.0",
