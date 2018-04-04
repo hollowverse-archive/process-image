@@ -12,9 +12,6 @@
     "check-ts/src": "tsc --project ./src --noEmit",
     "check-ts/root": "tsc --project ./ --noEmit",
     "check-ts": "run-p 'check-ts/*'",
-    "build": "mkdir -p dist && NODE_ENV=production run-p 'build/*'",
-    "build/webpack": "webpack",
-    "build/yarn": " cp package.json yarn.lock ./dist && cd dist && yarn",
     "deploy": "babel-node deploy.js",
     "clean": "del-cli ./dist build.zip",
     "lint": "run-p -l --aggregate-output lint-ts lint-js check-ts",
@@ -51,7 +48,6 @@
     "s3-upload-stream": "^1.0.7"
   },
   "resolutions": {
-    "webpack-sources": "1.0.1",
     "babel-core": "^7.0.0-bridge.0"
   },
   "devDependencies": {
@@ -98,7 +94,7 @@
     "stylelint-config-standard": "^17.0.0",
     "stylelint-no-unsupported-browser-features": "^1.0.0",
     "ts-jest": "^22.4.2",
-    "ts-loader": "3",
+    "ts-loader": "^4.1.0",
     "ts-node": "^5.0.1",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.8.0",
@@ -107,8 +103,8 @@
     "tslint-react": "^3.5.1",
     "typescript": "^2.8.1",
     "typescript-eslint-parser": "^14.0.0",
-    "uglifyjs-webpack-plugin": "^1.2.4",
-    "webpack": "3",
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.13",
     "webpack-node-externals": "^1.6.0",
     "yarnhook": "^0.1.1"
   },
