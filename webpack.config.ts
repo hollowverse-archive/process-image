@@ -3,13 +3,12 @@ import webpack from 'webpack';
 import slsw from 'serverless-webpack';
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
-import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
-import { mapValues } from 'lodash';
-import { ifProd } from '@hollowverse/utils/helpers/env';
+import { isProd } from '@hollowverse/utils/helpers/env';
 
 module.exports = {
   entry: slsw.lib.entries,
   target: 'node',
+  mode: isProd ? 'production' : 'development',
   devtool: 'source-map',
   output: {
     libraryTarget: 'commonjs',
@@ -35,23 +34,6 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  plugins: [
-    new webpack.WatchIgnorePlugin([/node_modules/]),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.DefinePlugin(
-      mapValues(
-        {
-          'process.env.NODE_ENV': process.env.NODE_ENV,
-        },
-        (v: any) => JSON.stringify(v),
-      ),
-    ),
-    ...ifProd([
-      new UglifyJSPlugin({
-        parallel: true,
-        sourceMap: true,
-      }),
-    ]),
-  ],
+  plugins: [new webpack.WatchIgnorePlugin([/node_modules/])],
   externals: [nodeExternals()],
 };
