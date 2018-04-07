@@ -24,24 +24,6 @@
     "pre-commit": "# Do nothing",
     "tslint": "yarn lint-ts"
   },
-  "jest": {
-    "globals": {
-      "ts-jest": {
-        "useBabelrc": true
-      }
-    },
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json"
-    ]
-  },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.44",
     "@hollowverse/utils": "^5.0.2",
@@ -67,7 +49,6 @@
     "@hollowverse/validate-filenames": "^1.4.0",
     "@types/aws-lambda": "^0.0.32",
     "@types/bluebird": "^3.5.20",
-    "@types/jest": "^22.2.2",
     "@types/lodash": "^4.14.104",
     "@types/node": "6",
     "@types/node-fetch": "^1.6.7",
@@ -79,8 +60,6 @@
     "eslint": "^4.18.2",
     "fast-glob": "^2.2.0",
     "husky": "^0.15.0-rc.8",
-    "jest": "^22.4.3",
-    "jest-image-snapshot": "^2.4.0",
     "lint-staged": "^7.0.0",
     "lodash": "^4.17.5",
     "npm-run-all": "^4.0.2",
@@ -88,7 +67,6 @@
     "serverless": "^1.26.1",
     "serverless-webpack": "^5.1.1",
     "shelljs": "^0.8.1",
-    "ts-jest": "^22.4.2",
     "ts-loader": "^4.1.0",
     "ts-node": "^5.0.1",
     "tslint": "^5.9.1",
@@ -126,5 +104,6 @@
   },
   "engines": {
     "node": ">= 6.10"
-  }
+  },
+  "jest": null
 }

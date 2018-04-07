@@ -4,5 +4,6 @@
     "pre-push": "yarn test",
     "pre-commit": "# Do nothing",
     "tslint": "yarn lint-ts"
-  }
+  },
+  "jest": null
 }
