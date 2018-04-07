@@ -63,7 +63,7 @@
     "@babel/polyfill": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
     "@hollowverse/clown": "^0.0.3",
-    "@hollowverse/config": "^6.1.2",
+    "@hollowverse/config": "^6.2.0",
     "@hollowverse/validate-filenames": "^1.4.0",
     "@types/aws-lambda": "^0.0.32",
     "@types/bluebird": "^3.5.20",
