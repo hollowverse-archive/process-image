@@ -8,7 +8,7 @@
   "license": "Unlicense",
   "private": true,
   "scripts": {
-    "test": "run-p -l --aggregate-output validate-filenames lint lint-staged 'clown check'",
+    "test": "run-p -l --aggregate-output common-check lint",
     "check-ts/src": "tsc --project ./src --noEmit",
     "check-ts/root": "tsc --project ./ --noEmit",
     "check-ts": "run-p 'check-ts/*'",
@@ -21,8 +21,9 @@
     "lint-staged": "lint-staged",
     "clown": "clown",
     "pre-push": "yarn test",
-    "pre-commit": "# Do nothing",
-    "tslint": "yarn lint-ts"
+    "pre-commit": "exit 0",
+    "tslint": "yarn lint-ts",
+    "common-check": "run-p -l -c --aggregate-output validate-filenames lint-staged 'clown check'"
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.44",
@@ -44,8 +45,8 @@
     "@babel/plugin-transform-runtime": "^7.0.0-beta.44",
     "@babel/polyfill": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
-    "@hollowverse/clown": "^0.0.3",
-    "@hollowverse/config": "^6.2.0",
+    "@hollowverse/clown": "^0.0.4",
+    "@hollowverse/config": "^7.1.0",
     "@hollowverse/validate-filenames": "^1.4.0",
     "@types/aws-lambda": "^0.0.32",
     "@types/bluebird": "^3.5.20",
