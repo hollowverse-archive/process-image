@@ -5,5 +5,7 @@
     "pre-commit": "exit 0",
     "tslint": "yarn lint-ts"
   },
-  "jest": null
+  "dependencies": {
+    "@hollowverse/utils": "^7.0.0"
+  }
 }

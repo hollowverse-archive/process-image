@@ -1,31 +1,31 @@
-import awsSdk from 'aws-sdk';
-import { S3Event } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
+import { S3 } from 'aws-sdk';
 import cloudinary from 'cloudinary';
 import path from 'path';
 import fetch from 'node-fetch';
 import fs from 'fs';
 import bluebird from 'bluebird';
 import s3UploadStream from 's3-upload-stream';
+import { readAwsSecretStringForStage } from '@hollowverse/utils/helpers/readAwsSecretStringForStage';
 
-const {
-  TARGET_BUCKET_NAME,
-  CLOUDINARY_CLOUD_NAME,
-  CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET,
-} = process.env;
+const { TARGET_BUCKET_NAME } = process.env;
 
-const s3 = new awsSdk.S3({
+const s3 = new S3({
   region: 'us-east-1',
 });
 
-cloudinary.config({
-  cloud_name: CLOUDINARY_CLOUD_NAME,
-  api_key: CLOUDINARY_API_KEY,
-  api_secret: CLOUDINARY_API_SECRET,
+const configureCloudinary = readAwsSecretStringForStage(
+  'cloudinary/apiConfig',
+).then(config => {
+  if (config === undefined) {
+    throw new TypeError('Could not get Cloudinary config');
+  }
+  cloudinary.config(JSON.parse(config));
 });
 
-export const processImage = async (event: S3Event) => {
-  const eventName = event.Records[0].eventName;
+export const processImage = async (event: AWSLambda.S3Event) => {
+  await configureCloudinary;
+
+  const { eventName } = event.Records[0];
   const sourceObjectKey = decodeURIComponent(
     // S3 replaces spaces in URIs with a plus sign (+)
     event.Records[0].s3.object.key.replace(/\+/g, ' '),
@@ -42,7 +42,10 @@ export const processImage = async (event: S3Event) => {
       })
       .promise();
   } else if (eventName.startsWith('ObjectCreated:')) {
-    const { public_id, eager: [{ url }] } = await bluebird.fromCallback(cb => {
+    const {
+      public_id: publicId,
+      eager: [{ url }],
+    } = await bluebird.fromCallback(async cb => {
       const downloadStream = s3
         .getObject({
           Bucket: sourceBucketName,
@@ -97,7 +100,7 @@ export const processImage = async (event: S3Event) => {
     }
 
     await bluebird
-      .fromCallback(cb => cloudinary.v2.api.delete_resources([public_id], cb))
+      .fromCallback(cb => cloudinary.v2.api.delete_resources([publicId], cb))
       .catch(error => {
         console.error('Failed to delete Cloudinary resource.', error);
       });
