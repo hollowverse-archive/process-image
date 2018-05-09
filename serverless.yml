@@ -4,6 +4,8 @@ plugins:
   - serverless-webpack
 
 custom:
+  regionAndAccount: us-east-1:251013100663
+  secretsArnPrefix: arn:aws:secretsmanager:${self:custom.regionAndAccount}:secret:${self:provider.stage}
   webpack:
     webpackConfig: webpack.config.ts
     packager: yarn
@@ -24,7 +26,7 @@ provider:
       Action:
         - secretsmanager:GetSecretValue
       Resource:
-        - "${self:provider.stage}/cloudinary/apiConfig"
+        - "${self:custom.secretsArnPrefix}/cloudinary/apiConfig"
     - Effect: Allow
       Action:
         - s3:GetObject*
