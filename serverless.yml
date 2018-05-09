@@ -4,6 +4,8 @@ plugins:
   - serverless-webpack
 
 custom:
+  regionAndAccount: us-east-1:251013100663
+  secretsArnPrefix: arn:aws:secretsmanager:${self:custom.regionAndAccount}:secret:${self:provider.stage}
   webpack:
     webpackConfig: webpack.config.ts
     packager: yarn
@@ -12,16 +14,19 @@ custom:
 provider:
   name: aws
   runtime: nodejs8.10
-  stage: ${opt:stage, 'development'}
+  stage: ${opt:stage, 'local'}
   memorySize: 128
   environment:
-    NODE_ENV: ${opt:stage, 'local'}
-    CLOUDINARY_CLOUD_NAME: 'hollowverse'
-    CLOUDINARY_API_KEY: '868831145451586'
-    CLOUDINARY_API_SECRET: ${file(./secrets/cloudinary.json):apiSecret}
+    NODE_ENV: ${env:NODE_ENV, 'development'}
+    STAGE: ${self:provider.stage}
     SOURCE_BUCKET_NAME: hollowverse.photos-unprocessed-${opt:stage, 'development'}
     TARGET_BUCKET_NAME: hollowverse.photos-processed-${opt:stage, 'development'}
   iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - secretsmanager:GetSecretValue
+      Resource:
+        - "${self:custom.secretsArnPrefix}/cloudinary/apiConfig"
     - Effect: Allow
       Action:
         - s3:GetObject*
