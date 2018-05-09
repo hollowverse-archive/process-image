@@ -22,6 +22,11 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
+        - secretsmanager:GetSecretValue
+      Resource:
+        - "${self:provider.stage}/cloudinary/apiConfig"
+    - Effect: Allow
+      Action:
         - s3:GetObject*
       Resource:
         - arn:aws:s3:::${self:provider.environment.SOURCE_BUCKET_NAME}/*
