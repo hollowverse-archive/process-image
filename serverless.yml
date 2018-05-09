@@ -24,7 +24,7 @@ provider:
       Action:
         - secretsmanager:GetSecretValue
       Resource: "*"
-      Conditions:
+      Condition:
         StringEquals:
           SecretId:
             - ${self:provider.stage}/cloudinary/apiConfig
