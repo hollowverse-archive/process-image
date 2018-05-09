@@ -6,18 +6,10 @@ const shelljs = require('shelljs');
 const {
   executeCommands,
 } = require('@hollowverse/utils/helpers/executeCommands');
-const { decryptSecrets } = require('@hollowverse/utils/helpers/decryptSecrets');
 
-const { ENC_PASS_CLOUDINARY, IS_PULL_REQUEST, BRANCH } = shelljs.env;
+const { IS_PULL_REQUEST, BRANCH } = shelljs.env;
 
 const isPullRequest = IS_PULL_REQUEST !== 'false';
-
-const secrets = [
-  {
-    password: ENC_PASS_CLOUDINARY,
-    decryptedFilename: 'cloudinary.json',
-  },
-];
 
 async function main() {
   const buildCommands = ['yarn test'];
@@ -29,7 +21,6 @@ async function main() {
   }
 
   const deploymentCommands = [
-    () => decryptSecrets(secrets, './secrets'),
     `NODE_ENV=production yarn serverless deploy
       --stage production
       --force
