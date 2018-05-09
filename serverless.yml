@@ -23,6 +23,7 @@ provider:
     - Effect: Allow
       Action:
         - secretsmanager:GetSecretValue
+      Resource: "*"
       Conditions:
         StringEquals:
           SecretId:
