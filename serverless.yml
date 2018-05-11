@@ -26,7 +26,7 @@ provider:
       Action:
         - secretsmanager:GetSecretValue
       Resource:
-        - "${self:custom.secretsArnPrefix}/cloudinary/apiConfig"
+        - "${self:custom.secretsArnPrefix}/cloudinary/apiConfig-*"
     - Effect: Allow
       Action:
         - s3:GetObject*
