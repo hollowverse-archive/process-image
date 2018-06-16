@@ -6,6 +6,10 @@ plugins:
 custom:
   regionAndAccount: us-east-1:251013100663
   secretsArnPrefix: arn:aws:secretsmanager:${self:custom.regionAndAccount}:secret:${self:provider.stage}
+
+  sourceBucketName: hollowverse.photos-unprocessed-${opt:stage, 'development'}
+  targetBucketName: hollowverse.photos-processed-${opt:stage, 'development'}
+
   webpack:
     webpackConfig: webpack.config.ts
     packager: yarn
@@ -19,8 +23,8 @@ provider:
   environment:
     NODE_ENV: ${env:NODE_ENV, 'development'}
     STAGE: ${self:provider.stage}
-    SOURCE_BUCKET_NAME: hollowverse.photos-unprocessed-${opt:stage, 'development'}
-    TARGET_BUCKET_NAME: hollowverse.photos-processed-${opt:stage, 'development'}
+    SOURCE_BUCKET_NAME: ${self:custom.sourceBucketName}
+    TARGET_BUCKET_NAME: ${self:custom.targetBucketName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -61,3 +65,13 @@ package:
   exclude:
     - .webpack
 
+resources:
+  Resources:
+    S3SourceBucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: ${self:custom.sourceBucketName}
+    S3TargetBucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: ${self:custom.targetBucketName}
