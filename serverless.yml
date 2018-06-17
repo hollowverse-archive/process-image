@@ -7,7 +7,11 @@ custom:
   regionAndAccount: us-east-1:251013100663
   secretsArnPrefix: arn:aws:secretsmanager:${self:custom.regionAndAccount}:secret:${self:provider.stage}
 
+  # This bucket is managed here.
+  # Why? See https://github.com/serverless/serverless/issues/4284
   sourceBucketName: hollowverse-photos-unprocessed-${opt:stage, 'development'}
+
+  # This bucket is managed in hollowverse/infrastructure
   targetBucketName: hollowverse-photos-processed-${opt:stage, 'development'}
 
   webpack:
