@@ -39,25 +39,25 @@ provider:
       Action:
         - s3:GetObject*
       Resource:
-        - arn:aws:s3:::${self:provider.environment.SOURCE_BUCKET_NAME}/*
+        - arn:aws:s3:::${self:custom.sourceBucketName}/*
     - Effect: Allow
       Action:
         - s3:DeleteObject*
         - s3:PutObject*
       Resource:
-        - arn:aws:s3:::${self:provider.environment.TARGET_BUCKET_NAME}/*
+        - arn:aws:s3:::${self:custom.targetBucketName}/*
 
 functions:
   processImage:
     handler: src/processImage.processImage
     events:
       - s3:
-          bucket: ${self:provider.environment.SOURCE_BUCKET_NAME}
+          bucket: ${self:custom.sourceBucketName}
           event: s3:ObjectCreated:*
           rules:
             - prefix: notable-people/
       - s3:
-          bucket: ${self:provider.environment.SOURCE_BUCKET_NAME}
+          bucket: ${self:custom.sourceBucketName}
           event: s3:ObjectRemoved:*
           rules:
             - prefix: notable-people/
