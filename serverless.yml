@@ -6,6 +6,14 @@ plugins:
 custom:
   regionAndAccount: us-east-1:251013100663
   secretsArnPrefix: arn:aws:secretsmanager:${self:custom.regionAndAccount}:secret:${self:provider.stage}
+
+  # This bucket is managed here.
+  # Why? See https://github.com/serverless/serverless/issues/4284
+  sourceBucketName: hollowverse-photos-unprocessed-${opt:stage, 'development'}
+
+  # This bucket is managed in hollowverse/infrastructure
+  targetBucketName: hollowverse-photos-processed-${opt:stage, 'development'}
+
   webpack:
     webpackConfig: webpack.config.ts
     packager: yarn
@@ -19,8 +27,8 @@ provider:
   environment:
     NODE_ENV: ${env:NODE_ENV, 'development'}
     STAGE: ${self:provider.stage}
-    SOURCE_BUCKET_NAME: hollowverse.photos-unprocessed-${opt:stage, 'development'}
-    TARGET_BUCKET_NAME: hollowverse.photos-processed-${opt:stage, 'development'}
+    SOURCE_BUCKET_NAME: ${self:custom.sourceBucketName}
+    TARGET_BUCKET_NAME: ${self:custom.targetBucketName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -31,25 +39,25 @@ provider:
       Action:
         - s3:GetObject*
       Resource:
-        - arn:aws:s3:::${self:provider.environment.SOURCE_BUCKET_NAME}/*
+        - arn:aws:s3:::${self:custom.sourceBucketName}/*
     - Effect: Allow
       Action:
         - s3:DeleteObject*
         - s3:PutObject*
       Resource:
-        - arn:aws:s3:::${self:provider.environment.TARGET_BUCKET_NAME}/*
+        - arn:aws:s3:::${self:custom.targetBucketName}/*
 
 functions:
   processImage:
     handler: src/processImage.processImage
     events:
       - s3:
-          bucket: ${self:provider.environment.SOURCE_BUCKET_NAME}
+          bucket: ${self:custom.sourceBucketName}
           event: s3:ObjectCreated:*
           rules:
             - prefix: notable-people/
       - s3:
-          bucket: ${self:provider.environment.SOURCE_BUCKET_NAME}
+          bucket: ${self:custom.sourceBucketName}
           event: s3:ObjectRemoved:*
           rules:
             - prefix: notable-people/
@@ -60,4 +68,3 @@ package:
     - secrets/**
   exclude:
     - .webpack
-
