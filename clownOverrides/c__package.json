@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "check-ts": "run-p 'check-ts/*'",
+    "pre-push": "yarn test",
+    "pre-commit": "exit 0"
+  }
+}
