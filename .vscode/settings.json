@@ -5,20 +5,20 @@
     "hollowverse",
     "loglevel",
     "promisify",
-    "webpagetest",
-    "unhandledrejection"
+    "unhandledrejection",
+    "uploader",
+    "webpagetest"
   ],
-  "workbench.colorTheme": "Default Light+",
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
-  "[json]": {
-    "editor.formatOnSave": false
-  },
   "files.associations": {
     "**/.babelrc": "jsonc",
     "**/.babelrc.json": "jsonc",
-    "**/tsconfig.json": "jsonc"
+    "**/tsconfig.json": "jsonc",
+    "**/tslint.json": "jsonc",
+    "**/.eslintrc.json": "jsonc",
+    "**/.prettierignore": "gitignore"
   },
   "typescript.implementationsCodeLens.enabled": true,
   "typescript.referencesCodeLens.enabled": true,

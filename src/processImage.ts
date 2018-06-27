@@ -25,6 +25,12 @@ const configureCloudinary = readAwsSecretStringForStage(
 export const processImage = async (event: AWSLambda.S3Event) => {
   await configureCloudinary;
 
+  if (!TARGET_BUCKET_NAME) {
+    throw new TypeError(
+      'Target bucket name was no specified, make sure it is passed as an environment variable',
+    );
+  }
+
   const { eventName } = event.Records[0];
   const sourceObjectKey = decodeURIComponent(
     // S3 replaces spaces in URIs with a plus sign (+)

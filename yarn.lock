@@ -715,12 +715,12 @@
     fast-extend "0.0.2"
     fs-monkey "^0.3.0"
 
-"@hollowverse/clown@^3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@hollowverse/clown/-/clown-3.1.1.tgz#42b862aec735c0c1ffb79e39b7b4f4e10e26c347"
+"@hollowverse/clown@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@hollowverse/clown/-/clown-3.2.0.tgz#be6d6654bb82f6edea587aeb7ecfdd219bdc12c5"
   dependencies:
-    "@babel/polyfill" "^7.0.0-beta.44"
-    "@babel/runtime" "^7.0.0-beta.44"
+    "@babel/polyfill" "^7.0.0-beta.46"
+    "@babel/runtime" "^7.0.0-beta.46"
     "@forabi/memfs" "^2.7.2"
     bluebird "^3.5.1"
     chalk "^2.3.2"
@@ -734,17 +734,16 @@
     lodash "^4.17.4"
     sort-keys "^2.0.0"
 
-"@hollowverse/config@^34.0.0":
-  version "34.0.0"
-  resolved "https://registry.yarnpkg.com/@hollowverse/config/-/config-34.0.0.tgz#a2ab48a9c49dcff8d2485a40f6af948a31d43d5d"
+"@hollowverse/config@^41.0.0":
+  version "41.0.0"
+  resolved "https://registry.yarnpkg.com/@hollowverse/config/-/config-41.0.0.tgz#81cddfa198dbecdabe989da336a56760ab9bcf06"
 
-"@hollowverse/utils@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@hollowverse/utils/-/utils-7.0.0.tgz#d6ab57b053827e6934398351a4a6d8719b7a4e93"
+"@hollowverse/utils@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@hollowverse/utils/-/utils-8.0.0.tgz#0515f2bd65cb13fd6ededeab34ca8653b3bb5112"
   dependencies:
-    "@babel/polyfill" "^7.0.0-beta.44"
-    "@babel/runtime" "^7.0.0-beta.44"
-    "@types/aws-lambda" "^0.0.34"
+    "@babel/polyfill" "^7.0.0-beta.46"
+    "@babel/runtime" "^7.0.0-beta.46"
     bluebird "^3.5.1"
     common-tags "^1.7.2"
     glob "^7.1.2"
@@ -788,10 +787,6 @@
   version "0.0.32"
   resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-0.0.32.tgz#34778e62957fe46a0da0cb5f470cafe8999a8fb9"
 
-"@types/aws-lambda@^0.0.34":
-  version "0.0.34"
-  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-0.0.34.tgz#dd6abb59a52dd2b674e9dd8e37de3485ea9cba7d"
-
 "@types/bluebird@^3.5.20":
   version "3.5.20"
   resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.20.tgz#f6363172add6f4eabb8cada53ca9af2781e8d6a1"
@@ -814,9 +809,9 @@
   version "9.4.7"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.7.tgz#57d81cd98719df2c9de118f2d5f3b1120dcd7275"
 
-"@types/node@6":
-  version "6.0.103"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.103.tgz#4fddb6c254756e98004039da4e4f4230d1e397ca"
+"@types/node@^8.10.17":
+  version "8.10.20"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.20.tgz#fe674ea52e13950ab10954433a7824438aabbcac"
 
 "@types/s3-upload-stream@^1.0.2":
   version "1.0.2"
@@ -3146,9 +3141,9 @@ eslint-plugin-react@^7.7.0:
     jsx-ast-utils "^2.0.1"
     prop-types "^15.6.0"
 
-eslint-plugin-typescript@^0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-typescript/-/eslint-plugin-typescript-0.11.0.tgz#a8480beeac1634271737e0ff8af32d9119b0d272"
+eslint-plugin-typescript@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-typescript/-/eslint-plugin-typescript-0.12.0.tgz#e23d58cb27fe28e89fc641a1f20e8d862cb99aef"
   dependencies:
     requireindex "~1.1.0"
 
@@ -5718,7 +5713,7 @@ npm-path@^2.0.2:
   dependencies:
     which "^1.2.10"
 
-npm-run-all@^4.1.2:
+npm-run-all@^4.1.3:
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/npm-run-all/-/npm-run-all-4.1.3.tgz#49f15b55a66bb4101664ce270cb18e7103f8f185"
   dependencies:
@@ -6181,9 +6176,9 @@ preserve@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
 
-prettier@^1.12.0:
-  version "1.12.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.12.1.tgz#c1ad20e803e7749faf905a409d2367e06bbe7325"
+prettier@^1.13.5:
+  version "1.13.6"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.13.6.tgz#00ae0b777ad92f81a9e7a1df2f0470b6dab0cb44"
 
 prettier@^1.5.3:
   version "1.11.1"
@@ -7709,9 +7704,9 @@ tslint-config-prettier@^1.8.0:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/tslint-config-prettier/-/tslint-config-prettier-1.12.0.tgz#bc8504f286ecf42b906f3d1126a093114f5729cc"
 
-tslint-eslint-rules@^5.0.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/tslint-eslint-rules/-/tslint-eslint-rules-5.2.0.tgz#3e767e7e9cc7877497a2bde5bcb6184dee9b28c4"
+tslint-eslint-rules@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/tslint-eslint-rules/-/tslint-eslint-rules-5.3.1.tgz#10dec4361df0b3e4385d91ff8e0226bda4ec2ad4"
   dependencies:
     doctrine "0.7.2"
     tslib "1.9.0"
@@ -7729,15 +7724,15 @@ tslint-microsoft-contrib@^5.0.3:
   dependencies:
     tsutils "^2.12.1"
 
-tslint-react@^3.5.1:
+tslint-react@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/tslint-react/-/tslint-react-3.6.0.tgz#7f462c95c4a0afaae82507f06517ff02942196a1"
   dependencies:
     tsutils "^2.13.1"
 
-tslint@^5.9.1:
-  version "5.9.1"
-  resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.9.1.tgz#1255f87a3ff57eb0b0e1f0e610a8b4748046c9ae"
+tslint@^5.10.0:
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.10.0.tgz#11e26bccb88afa02dd0d9956cae3d4540b5f54c3"
   dependencies:
     babel-code-frame "^6.22.0"
     builtin-modules "^1.1.1"
@@ -7794,16 +7789,16 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript-eslint-parser@^15.0.0:
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/typescript-eslint-parser/-/typescript-eslint-parser-15.0.0.tgz#882fd3d7aabffbab0a7f98d2a59fb9a989c2b37f"
+typescript-eslint-parser@^16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/typescript-eslint-parser/-/typescript-eslint-parser-16.0.0.tgz#14a9ab75932b15af919602faef553c6f0487f352"
   dependencies:
     lodash.unescape "4.0.1"
     semver "5.5.0"
 
-typescript@^2.8.1:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.8.1.tgz#6160e4f8f195d5ba81d4876f9c0cc1fbc0820624"
+typescript@^2.9.2:
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
 
 ua-parser-js@^0.7.9:
   version "0.7.18"
